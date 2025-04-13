@@ -274,7 +274,7 @@ const Piano = ({ detectedNote }) => {
   const fileInputRef = React.useRef(null);
 
   return (
-    <div className="bg-white p-6 max-w-5xl">
+    <div className="bg-white p-6">
       {/* Note detection indicator */}
       <div className="mb-4 p-3 rounded-lg border bg-gray-50">
         <div className="flex justify-between items-center">

@@ -4,6 +4,7 @@ import {
   AudioFileAnalyzer,
   MicrophoneAnalyzer,
   NoteDisplay,
+  Metronome,
 } from "./components";
 
 export function NoteDetector() {
@@ -36,7 +37,7 @@ export function NoteDetector() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-gray-100 min-h-screen">
+    <div className="flex flex-col items-center justify-center p-6 min-h-screen">
       <div className="w-full p-4 flex rounded-lg bg-white">
         <div className="p-6">
           <div className="rounded-lg p-6 mb-6">
@@ -93,6 +94,8 @@ export function NoteDetector() {
             <p>O también puedes subir un audio para analizar las notas</p>
             <small>Recuerda que no puedes hacer ambas</small>
           </div>
+
+          <Metronome />
         </div>
 
         {/* Piano */}

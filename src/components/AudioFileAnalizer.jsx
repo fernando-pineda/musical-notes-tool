@@ -16,34 +16,28 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
   const pitchDetectorRef = useRef(null);
   const animationRef = useRef(null);
 
-  // Crear URL para el archivo de audio
   useEffect(() => {
     if (file) {
       const url = URL.createObjectURL(file);
       setAudioUrl(url);
 
-      // Limpiar URL al desmontar
       return () => URL.revokeObjectURL(url);
     }
   }, [file]);
 
-  // Configurar analizador de audio y detector de tono
   useEffect(() => {
     if (!audioUrl) return;
 
     const setupAudioAnalyzer = async () => {
       try {
-        // Crear contexto de audio si no existe
         if (!audioContextRef.current) {
           audioContextRef.current = new (window.AudioContext ||
             window.webkitAudioContext)();
         }
 
-        // Configurar analizador
         analyzerRef.current = audioContextRef.current.createAnalyser();
         analyzerRef.current.fftSize = 2048;
 
-        // Inicializar detector de tono
         pitchDetectorRef.current = new PitchDetector(
           audioContextRef.current.sampleRate
         );
@@ -56,7 +50,6 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
     setupAudioAnalyzer();
 
     return () => {
-      // Limpiar al desmontar
       if (sourceNodeRef.current) {
         sourceNodeRef.current.disconnect();
       }
@@ -71,7 +64,6 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
     };
   }, [audioUrl]);
 
-  // Manejar eventos de audio
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -138,11 +130,9 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
     const updatePitch = () => {
       analyzerRef.current.getFloatTimeDomainData(timeData);
 
-      // Detectar tono usando el algoritmo YIN
       const pitch = pitchDetectorRef.current.getPitch(timeData);
 
       if (pitch > 0) {
-        // Encontrar la nota más cercana
         const detectedNote = findClosestNote(pitch);
         onNoteDetected(detectedNote);
       }
@@ -176,7 +166,6 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
     return matchedNote || null;
   };
 
-  // Funciones de control de reproducción
   const togglePlayPause = () => {
     const audio = audioRef.current;
     if (isPlaying) {
@@ -185,10 +174,13 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
       audio.play();
     }
   };
-
   const seekAudio = (e) => {
-    const seekPosition = e.nativeEvent.offsetX / e.target.clientWidth;
-    const newTime = duration * seekPosition;
+    const seekBar = e.currentTarget;
+    const rect = seekBar.getBoundingClientRect();
+    const seekPosition = (e.clientX - rect.left) / rect.width;
+    const clampedPosition = Math.max(0, Math.min(seekPosition, 1));
+    const newTime = duration * clampedPosition;
+
     setCurrentTime(newTime);
     audioRef.current.currentTime = newTime;
   };
@@ -209,7 +201,7 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
     <div className="p-4 bg-gray-700 bg-opacity-50 rounded-lg">
       <audio ref={audioRef} src={audioUrl} className="hidden" />
 
-      <div className="mb-2 text-sm font-medium">
+      <div className="mb-2 text-sm font-medium text-white">
         {file?.name || "Audio file"}
       </div>
 
@@ -234,7 +226,7 @@ const AudioFileAnalyzer = ({ file, onNoteDetected }) => {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between text-white">
           <div className="flex items-center space-x-4">
             <button
               onClick={togglePlayPause}
